@@ -9,10 +9,9 @@
  * @license Attribution-Share Alike 2.5 Canada <http://creativecommons.org/licenses/by-sa/2.5/ca/>
  * @author Istvan Pusztai <http://istvanp.me>
  * @link http://github.com/istvanp/CodeIgniter-MY_Model.git
- * @version 1.0.0 $Id: MY_Model.php 12 2010-01-06 16:54:11Z Istvan $
+ * @version 1.1.0 $Id: MY_Model.php 15 2010-01-31 04:07:56Z Istvan $
  * @copyright Copyright (c) 2010, Istvan Pusztai <http://istvanp.me>
  **/
- 
 class MY_Model extends Model
 {
 	/**
@@ -20,7 +19,7 @@ class MY_Model extends Model
 	 *
 	 * @var string
 	 */
-	const DATE_DATETIME = 'Y-m-d h:i:s';
+	const DATE_DATETIME = 'Y-m-d H:i:s';
 	
 	/**
 	 * Name of the table. This is set automatically via the name of the
@@ -122,9 +121,6 @@ class MY_Model extends Model
 	public function MY_Model()
 	{
 		parent::Model();
-		
-		// Set column name prefix
-		$this->set_prefix($this->get_table_name().'_');
 		
 		// Set the debug variable via an external constant
 		if (defined('DEBUG_SCHEMA'))
@@ -382,7 +378,7 @@ class MY_Model extends Model
 		{
 			if ($this->debug)
 			{
-				throw new Exception("Column $key is not defined in schema");
+				throw new DBSchemaException("Column '$key' is not defined in schema");
 			}
 			return NULL;
 		}
@@ -546,18 +542,18 @@ class MY_Model extends Model
 	{
 		// Flags
 		define('PK',			1);	// PRIMARY KEY
-		define('NN', 			2); // NOT NULL
-		define('UN', 			4); // UNSIGNED
-		define('AI',			8); // AUTO-INCREMENT
+		define('NN', 			2);	// NOT NULL
+		define('UN', 			4);	// UNSIGNED
+		define('AI',			8);	// AUTO-INCREMENT
 		
 		// Abstract data types
-		define('ADT_STRING',	1);		// Data is a string
-		define('ADT_NUMERIC',	2);		// Data is numeric
-		define('ADT_DATE',		4);		// Data is a date and/or time
+		define('ADT_STRING',		1);	// Data is a string
+		define('ADT_NUMERIC',		2);	// Data is numeric
+		define('ADT_DATE',		4);	// Data is a date and/or time
 		
 		// ADT Flags
-		define('ADTF_VARLEN',	8);		// Data type allows arbitral length
-		define('ADTF_SCALE',	16);	// Data type allows specifying scale (not fully handled yet)
+		define('ADTF_VARLEN',		8);	// Data type allows arbitral length
+		define('ADTF_SCALE',		16);	// Data type allows specifying scale (not fully handled yet)
 		define('ADTF_ENUM',		32);	// Data type is an enumration
 		
 		// Powers of 2
@@ -577,8 +573,8 @@ class MY_Model extends Model
 		define('TINYTEXT',	ADT_STRING + POW2_8);
 		define('BLOB',		ADT_STRING + POW2_16);
 		define('TEXT',		ADT_STRING + POW2_16);
-		define('MEDIUMBLOB',ADT_STRING + POW2_24);
-		define('MEDIUMTEXT',ADT_STRING + POW2_24);
+		define('MEDIUMBLOB',	ADT_STRING + POW2_24);
+		define('MEDIUMTEXT',	ADT_STRING + POW2_24);
 		define('LONGBLOB',	ADT_STRING + POW2_32);
 		define('LONGTEXT',	ADT_STRING + POW2_32);
 		define('ENUM',		ADT_STRING + ADTF_ENUM);
@@ -621,7 +617,7 @@ class MY_Model extends Model
 			// We can't do anything with an empty schema!
 			if ($this->debug)
 			{
-				throw new Exception("Schema is not defined");
+				throw new DBSchemaException("Schema is not defined");
 			}
 			return FALSE;
 		}
@@ -637,7 +633,7 @@ class MY_Model extends Model
 			{
 				if ($this->debug)
 				{
-					throw new Exception("Column $key is not defined in schema");
+					throw new DBSchemaException("Column '$key' is not defined in schema");
 				}
 				return FALSE;
 			}
@@ -651,7 +647,7 @@ class MY_Model extends Model
 					{
 						if ($this->debug)
 						{
-							throw new Exception("Column $key cannot be auto-increment if its data type is not numeric");
+							throw new DBSchemaException("Column '$key' cannot be auto-increment if its data type is not numeric");
 						}
 					}
 					else
@@ -667,7 +663,7 @@ class MY_Model extends Model
 					{
 						if ($this->debug)
 						{
-							throw new Exception("Primary key value cannot be null for column $key");
+							throw new DBSchemaException("Primary key value cannot be null for column $key");
 						}
 					}
 				}
@@ -681,7 +677,7 @@ class MY_Model extends Model
 				{
 					if ($this->debug)
 					{
-						throw new Exception("Value cannot be null for column $key");
+						throw new DBSchemaException("Value cannot be null for column $key");
 					}
 					return FALSE;
 				}
@@ -694,7 +690,7 @@ class MY_Model extends Model
 				{
 					if ($this->debug)
 					{
-						throw new Exception("Value for column $key must be a string");
+						throw new DBSchemaException("Value for column $key must be a string");
 					}
 					return FALSE;
 				}
@@ -732,7 +728,7 @@ class MY_Model extends Model
 						{
 							if ($this->debug)
 							{
-								throw new Exception("Value for column $key exceeds maximum length for its datatype");
+								throw new DBSchemaException("Value for column $key exceeds maximum length for its datatype");
 							}
 							return FALSE;
 						}
@@ -742,7 +738,7 @@ class MY_Model extends Model
 					{
 						if ($this->debug)
 						{
-							throw new Exception("Value for column $key exceeds maximum length specified in schema");
+							throw new DBSchemaException("Value for column $key exceeds maximum length specified in schema");
 						}
 						return FALSE;
 					}
@@ -755,7 +751,7 @@ class MY_Model extends Model
 					{
 						if ($this->debug)
 						{
-							throw new Exception("Schema definition for $key does not enumerate possible values");
+							throw new DBSchemaException("Schema definition for $key does not enumerate possible values");
 						}
 						return FALSE;
 					}
@@ -764,7 +760,7 @@ class MY_Model extends Model
 					{
 						if ($this->debug)
 						{
-							throw new Exception("Enum value given for column $key is not in schema");
+							throw new DBSchemaException("Enum value given for column $key is not in schema");
 						}
 						return FALSE;
 					}
@@ -779,7 +775,7 @@ class MY_Model extends Model
 						{
 							if ($this->debug)
 							{
-								throw new Exception("Value for column $key exceeds maximum length specified in schema");
+								throw new DBSchemaException("Value for column $key exceeds maximum length specified in schema");
 							}
 							return FALSE;
 						}
@@ -802,7 +798,7 @@ class MY_Model extends Model
 						{
 							if ($this->debug)
 							{
-								throw new Exception("Value for column $key exceeds maximum length for its datatype");
+								throw new DBSchemaException("Value for column $key exceeds maximum length for its datatype");
 							}
 							return FALSE;
 						}
@@ -816,7 +812,7 @@ class MY_Model extends Model
 				{
 					if ($this->debug)
 					{
-						throw new Exception("Value is not numeric for numeric column $key");
+						throw new DBSchemaException("Value is not numeric for numeric column $key");
 					}
 					return FALSE;
 				}
@@ -828,7 +824,7 @@ class MY_Model extends Model
 					{
 						if ($this->debug)
 						{
-							throw new Exception("Value cannot be negative for unsigned column $key");
+							throw new DBSchemaException("Value cannot be negative for unsigned column $key");
 						}
 						return FALSE;
 					}
@@ -842,7 +838,7 @@ class MY_Model extends Model
 						{
 							if ($this->debug)
 							{
-								throw new Exception("Schema is not using a float value for specifying precision and scale for the column $key");
+								throw new DBSchemaException("Schema is not using a float value for specifying precision and scale for the column $key");
 							}
 							return FALSE;
 						}
@@ -852,7 +848,7 @@ class MY_Model extends Model
 					{
 						if ($this->debug)
 						{
-							throw new Exception("Value for column $key exceeds maximum length specified in schema");
+							throw new DBSchemaException("Value for column $key exceeds maximum length specified in schema");
 						}
 						return FALSE;
 					}
@@ -876,7 +872,7 @@ class MY_Model extends Model
 					{
 						if ($this->debug)
 						{
-							throw new Exception("Value for column $key exceeds maximum length for its datatype");
+							throw new DBSchemaException("Value for column $key exceeds maximum length for its datatype");
 						}
 						return FALSE;
 					}
@@ -888,7 +884,7 @@ class MY_Model extends Model
 				{
 					if ($this->debug)
 					{
-						throw new Exception("Value for column $key is not a correct date/time");
+						throw new DBSchemaException("Value for column $key is not a correct date/time");
 					}
 					return FALSE;
 				}
@@ -922,4 +918,46 @@ class MY_Model extends Model
 		return $result;
 	}
 }
+/**
+ * Set custom Exceptions
+ *
+ * DBSchemaException:
+ *     This exception is thrown when validation of the query against the schema
+ *     fails. This is only applies to create() and update() functions.
+ * DBTransactionException:
+ *     This exception is used for transaction operations (refer to CI docs) and
+ *     should be thrown by the controller if $this->db->trans_status() === FALSE
+ *     (in other words, it's up to you to use it)
+ * DBQueryException:
+ *     This exception is thrown when 'db_debug' config is set to TRUE and there
+ *     is an error with a query.
+ *     NOTE: system/database/DB_driver.php must be tweaked to throw this instead
+ *           of the defaut db error template. To do so remove or comment out the
+ *           following in the display_error() function:
+ *               $error =& load_class('Exceptions');
+ *               echo $error->show_error($heading, $message, 'error_db');
+ *           and replace it with:
+ *               throw new DBQueryException($message);
+ */
+class DBSchemaException extends Exception {}
+class DBTransactionException extends Exception {}
+class DBQueryException extends Exception
+{
+	public $errorArr;
+	public function __construct($message, $code = 0, Exception $previous = null)
+	{
+		$msg = $message;
+		if (is_array($message))
+		{
+			$this->errorArr = $message;
+			$msg = $message[1];
+			
+			// Pre-load text helper
+			$CI =& get_instance();
+			$CI->load->helper('text');
+		}
+		parent::__construct($msg, $code, $previous);
+	}
+}
+
 /* End of file MY_Model.php */
